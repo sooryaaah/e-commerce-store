@@ -107,25 +107,56 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-export const getRecommendedProducts = async (req, res) =>{
+export const getRecommendedProducts = async (req, res) => {
   try {
     const products = await Product.aggregate([
       {
-        $sample: {size: 3}
+        $sample: { size: 3 },
       },
       {
-        $project:{
-          _id:1,
-          name:1,
-          description:1,
-          image:1,
-          price:1
-        }
-      }
-    ])
-   return res.status(200).json(products)
+        $project: {
+          _id: 1,
+          name: 1,
+          description: 1,
+          image: 1,
+          price: 1,
+        },
+      },
+    ]);
+    return res.status(200).json(products);
   } catch (error) {
     console.log("error in getRecommendedProducts", error.message);
-    return res.status(500).json({message: "server error", error: error.message})
+    return res
+      .status(500)
+      .json({ message: "server error", error: error.message });
+  }
+};
+
+export const toggleFeaturedProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (product) {
+      product.isFeatured = !product.isFeatured;
+      const updatedProduct = await product.save();
+      await updateFeaturedProductsCache();
+      return res.status(200).json(updatedProduct)
+    }else{
+      return res.status(404).json({message:"product not found"})
+    }
+  } catch (error) {
+    console.log("error in toggleFeaturedProduct controller", error.message);
+    return res
+      .status(500)
+      .json({ message: "server error", error: error.message });
+  }
+};
+
+async function updateFeaturedProductsCache() {
+  try {
+    const featuredProducts = await Product.find({isFeatured:true})
+    await redis.set("featured_products", JSON.stringify(featuredProducts))
+  } catch (error) {
+    console.log("error in updateFeaturedProductsCache controller :", error.message);
+    
   }
 }
