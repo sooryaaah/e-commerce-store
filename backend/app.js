@@ -7,6 +7,7 @@ import productRoutes from "./routes/productRoutes.js"
 import cartRoutes from "./routes/cartRoutes.js"
 import couponRoutes from "./routes/couponRoutes.js"
 import paymentRoutes from "./routes/paymentRoutes.js"
+import analyticsRoutes from "./routes/analyticsRoutes.js"
 import { mongoconnect } from "./db/connect.js";
 
 
@@ -23,6 +24,7 @@ app.use("/api/products", productRoutes)
 app.use("/api/cart", cartRoutes)
 app.use("/api/coupons", couponRoutes)
 app.use("/api/payments", paymentRoutes  )
+app.use("/api/analytics", analyticsRoutes)
 
 
 app.listen(PORT, ()=>{

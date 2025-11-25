@@ -23,7 +23,7 @@ const storeRefreshToken = async (userId, refreshToken) => {
     refreshToken,
     "EX",
     7 * 24 * 60 * 60
-  ); //expires in 7 days
+  ); //expires in 7 days 
 };
 
 const setCookies = (res, accessToken, refreshToken) => {
