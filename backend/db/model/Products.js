@@ -18,11 +18,13 @@ const productSchema = new mongoose.Schema(
     image: {
       secure_url: {
         type: String,
+        required: true,
       },
       publicId: {
         type: String,
+        required: true,
       },
-      required: [true, "image is required"],
+      
     },
     category: {
       type: String,

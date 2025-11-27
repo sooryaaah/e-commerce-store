@@ -1,6 +1,6 @@
 import multer from "multer";
 import streamifier from "streamifier";
-import cloudinary from "../db/cloudinary";
+import cloudinary from "../db/cloudinary.js";
 
 const storage = multer.memoryStorage();  //multer= package for handling images => created a temporary memory storage
 const upload = multer({storage})
