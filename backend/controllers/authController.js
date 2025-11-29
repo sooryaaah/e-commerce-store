@@ -23,7 +23,7 @@ const storeRefreshToken = async (userId, refreshToken) => {
     refreshToken,
     "EX",
     7 * 24 * 60 * 60
-  ); //expires in 7 days 
+  ); //expires in 7 days
 };
 
 const setCookies = (res, accessToken, refreshToken) => {
@@ -136,34 +136,46 @@ export const refreshToken = async (req, res) => {
     if (!refreshToken) {
       return res.status(400).json({
         message: "refresh token not found",
-      })
+      });
     }
 
     const decode = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-    const storedToken = await redis.get(`refreshToken:${decode.userId}`)
+    const storedToken = await redis.get(`refreshToken:${decode.userId}`);
 
-    if(refreshToken !== storedToken){
+    if (refreshToken !== storedToken) {
       return res.status(400).json({
-        message: "invalid refresh token"
-      })
+        message: "invalid refresh token",
+      });
     }
 
-    const accessToken = jwt.sign({userId: decode.userId}, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "15m"
-    })
+    const accessToken = jwt.sign(
+      { userId: decode.userId },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: "15m",
+      }
+    );
 
     res.cookie("accessToken", accessToken, {
-      httpOnly: true, 
+      httpOnly: true,
       sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",          
+      secure: process.env.NODE_ENV === "production",
       maxAge: 15 * 60 * 1000, //15 minutes
-    })
+    });
 
     return res.status(200).json({
       message: "token refreshed successfully",
-      
-    })
+    });
+  } catch (error) {
+    console.log("error in refreshToken controller: ", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const getProfile = async (req, res) => {
+  try {
+    return res.json(req.user);
   } catch (error) {
     console.log("error in refreshToken controller: ", error);
     return res.status(500).json({ error: error.message });
