@@ -55,8 +55,8 @@ const Navbar = () => {
             {/* Admin Dashboard */}
             {isAdmin && (
               <Link
-                to="/admin"
                 className="group flex items-center bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 rounded-md transition"
+                to="/secret-dashboard"
               >
                 <Lock size={18} className="mr-1" />
                 <span className="hidden sm:inline">Dashboard</span>
