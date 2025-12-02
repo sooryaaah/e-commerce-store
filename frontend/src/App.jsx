@@ -5,21 +5,28 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import AdminPage from "./pages/AdminPage";
+import CategoryPage from "./pages/CategoryPage";
+import CartPage from "./pages/CartPage";
 
 import Navbar from "./components/Navbar";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { Toaster } from "react-hot-toast";
 import { useUserStore } from "./stores/useUserStore";
+import { useCartStore } from "./stores/useCartStore";
 
 const App = () => {
-
-  const {user, checkAuth, chechkingAuth} = useUserStore()
+  const { user, checkAuth, chechkingAuth } = useUserStore();
+  const { getCartItems } = useCartStore();
   useEffect(() => {
-    checkAuth()
-  }, [checkAuth])
+    checkAuth();
+  }, [checkAuth]);
 
-  if(chechkingAuth) return <LoadingSpinner/>
-  
+  useEffect(() => {
+    getCartItems();
+  }, [getCartItems]);
+
+  if (chechkingAuth) return <LoadingSpinner />;
+
   return (
     <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
@@ -29,18 +36,37 @@ const App = () => {
       </div>
 
       <div className="relative z-50 pt-50">
-        
         <Router>
           <Navbar />
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
-            <Route path="/signup" element={!user ? <SignUpPage/> : <Navigate to="/" />} />
-            <Route path="/secret-dashboard" element={user?.role === "admin" ? <AdminPage/> : <Navigate to="/login"/> } />
+            <Route
+              path="/login"
+              element={!user ? <LoginPage /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/signup"
+              element={!user ? <SignUpPage /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/secret-dashboard"
+              element={
+                user?.role === "admin" ? (
+                  <AdminPage />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/cart"
+              element={user ? <CartPage /> : <Navigate to="/login" />}
+            />
+            <Route path="/category/:category" element={<CategoryPage />} />
           </Routes>
         </Router>
       </div>
-      <Toaster/>
+      <Toaster />
     </div>
   );
 };
