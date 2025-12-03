@@ -49,9 +49,9 @@ const Navbar = () => {
                 </span>
 
                 {/* Cart Count Badge */}
-                <span className="absolute -top-2 -left-2 bg-emerald-500 text-white rounded-full px-2 py-0.5 text-xs">
+                {cart.length> 0 && <span className="absolute -top-2 -left-2 bg-emerald-500 text-white rounded-full px-2 py-0.5 text-xs">
                   {cart.length}
-                </span>
+                </span>}
               </Link>
             )}
 
