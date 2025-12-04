@@ -1,6 +1,8 @@
 import Coupon from "../db/model/Coupon.js";
 import Order from "../db/model/Order.js";
 import { stripe } from "../db/stripe.js";
+import User from "../db/model/User.js";
+
 
 export const createCheckoutSession = async (req, res) => {
   try {
@@ -27,6 +29,7 @@ export const createCheckoutSession = async (req, res) => {
           },
           unit_amount: amount,
         },
+        quantity: product.quantity || 1,
       };
     });
 
@@ -48,7 +51,7 @@ export const createCheckoutSession = async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/purchase-session?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.CLIENT_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/purchase-cancel`,
       discounts: coupon
         ? [
@@ -71,7 +74,7 @@ export const createCheckoutSession = async (req, res) => {
     if(totalAmount >= 20000){
       await createNewCoupon(req.user._id)
     }
-    res.status(200).json({ sessionId: session.id, totalAmount: totalAmount / 100});
+    res.status(200).json({ url: session.url, totalAmount: totalAmount / 100});
   } catch (error) {
     console.log("error in createCheckoutSession controller", error.message);
     return res
@@ -108,6 +111,10 @@ export const checkoutSuccess = async (req, res) => {
         stripeSessionId: sessionId,
       });
       await newOrder.save();
+
+      await User.findByIdAndUpdate(session.metadata.userId, {
+        cartItems: [],
+      });
       res.status(200).json({
         success: true,
         message: "order created successfully",
@@ -131,6 +138,7 @@ async function createStripeCoupon(discountPercentage) {
 }
 
 async function createNewCoupon(userId) {
+  await Coupon.findOneAndDelete({ userId: userId });
   const newCoupon = new Coupon({
     code: "GIFT",
     discountPercentage: 10,

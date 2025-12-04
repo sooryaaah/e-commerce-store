@@ -5,32 +5,31 @@ import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
 
 const Navbar = () => {
-  const {user, logout} = useUserStore();
+  const { user, logout } = useUserStore();
+
   const isAdmin = user?.role === "admin";
 
-  const {cart} = useCartStore();
+
+  const { cart } = useCartStore();
 
   return (
     <header className="fixed top-0 left-0 w-full bg-gray-900 bg-opacity-90 backdrop-blur-md shadow-lg z-40 border-b border-emerald-900">
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
-          
           {/* Logo */}
           <Link
             to="/"
             className="group flex items-center space-x-2 text-2xl font-bold text-emerald-400"
           >
-            <span className="group-hover:text-emerald-300 transition">E-commerce</span>
+            <span className="group-hover:text-emerald-300 transition">
+              E-commerce
+            </span>
           </Link>
 
           {/* Nav */}
           <nav className="flex items-center gap-4">
-
             {/* Home */}
-            <Link
-              to="/"
-              className="group text-gray-300 transition"
-            >
+            <Link to="/" className="group text-gray-300 transition">
               <span className="group-hover:text-emerald-400">Home</span>
             </Link>
 
@@ -49,9 +48,11 @@ const Navbar = () => {
                 </span>
 
                 {/* Cart Count Badge */}
-                {cart.length> 0 && <span className="absolute -top-2 -left-2 bg-emerald-500 text-white rounded-full px-2 py-0.5 text-xs">
-                  {cart.length}
-                </span>}
+                {cart.length > 0 && (
+                  <span className="absolute -top-2 -left-2 bg-emerald-500 text-white rounded-full px-2 py-0.5 text-xs">
+                    {cart.length}
+                  </span>
+                )}
               </Link>
             )}
 
@@ -68,7 +69,8 @@ const Navbar = () => {
 
             {/* User Auth Buttons */}
             {user ? (
-              <button onClick={logout}
+              <button
+                onClick={logout}
                 className="group flex items-center bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-md transition"
               >
                 <LogOut size={18} />

@@ -7,6 +7,8 @@ import SignUpPage from "./pages/SignUpPage";
 import AdminPage from "./pages/AdminPage";
 import CategoryPage from "./pages/CategoryPage";
 import CartPage from "./pages/CartPage";
+import PurchaseSuccessPage from "./pages/PurchaseSuccessPage";
+import PurchaseCancelPage from "./pages/PurchaseCancelPage";  
 
 import Navbar from "./components/Navbar";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -15,18 +17,18 @@ import { useUserStore } from "./stores/useUserStore";
 import { useCartStore } from "./stores/useCartStore";
 
 const App = () => {
-  const { user, checkAuth, chechkingAuth } = useUserStore();
+  const { user, checkAuth, checkingAuth } = useUserStore();
   const { getCartItems } = useCartStore();
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
   useEffect(() => {
-    if(!user) return;
-      getCartItems();
-  }, [getCartItems]);
+    if (!user) return;
+    getCartItems();
+  }, [user,getCartItems]);
 
-  if (chechkingAuth) return <LoadingSpinner />;
+  if (checkingAuth) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
@@ -36,7 +38,7 @@ const App = () => {
         </div>
       </div>
 
-      <div className="relative z-50 pt-50">
+      <div className="relative z-50 pt-12">
         <Router>
           <Navbar />
           <Routes>
@@ -64,6 +66,8 @@ const App = () => {
               element={user ? <CartPage /> : <Navigate to="/login" />}
             />
             <Route path="/category/:category" element={<CategoryPage />} />
+            <Route path="/purchase-success" element={user ? <PurchaseSuccessPage /> : <Navigate to="/login" />} />
+            <Route path="/purchase-cancel" element={user ? <PurchaseCancelPage /> : <Navigate to="/login" />} />
           </Routes>
         </Router>
       </div>

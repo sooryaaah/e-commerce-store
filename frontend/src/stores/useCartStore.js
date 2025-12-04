@@ -9,6 +9,29 @@ export const useCartStore = create((set, get) => ({
   subtotal: 0,
   isCouponApplied: false,
 
+  getMyCoupon: async () => {
+    try {
+      const response = await axios.get("/coupons");
+      set({ coupon: response.data });
+    } catch (error) {
+      console.error("Error fetching coupon:", error);
+    }
+  },
+  applyCoupon: async (code) => {
+    try {
+      const response = await axios.post("/coupons/validate", { code });
+      set({ coupon: response.data, isCouponApplied: true });
+      get().calculateTotals();
+      toast.success("Coupon applied successfully");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to apply coupon");
+    }
+  },
+  removeCoupon: () => {
+    set({ coupon: null, isCouponApplied: false });
+    get().calculateTotals();
+    toast.success("Coupon removed");
+  },
   getCartItems: async () => {
     try {
       const res = await axios.get("/cart");
@@ -22,6 +45,11 @@ export const useCartStore = create((set, get) => ({
         toast.error(msg || "Something went wrong");
       }
     }
+  },
+  clearCart: async () => {
+    set({ cart: [], coupon: null, total: 0, subtotal: 0 });
+
+    //  localStorage.removeItem("cart");
   },
 
   addToCart: async (product) => {
@@ -92,7 +120,7 @@ export const useCartStore = create((set, get) => ({
       0
     );
     const total = coupon
-      ? subtotal - subtotal * (coupon.discount / 100)
+      ? subtotal - subtotal * (coupon.discountPercentage / 100)
       : subtotal;
     set({ subtotal, total });
   },
