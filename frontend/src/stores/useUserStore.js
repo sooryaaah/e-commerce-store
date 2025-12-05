@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 import axiosInstance from "../lib/axios";
 import { toast } from "react-hot-toast";
+import axios from "axios";
 
 export const useUserStore = create((set, get) => ({
   user: null,
@@ -70,4 +71,45 @@ export const useUserStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Something went wrong");
     }
   },
+
+  refreshToken: async () => {
+    if(get().checkingAuth) return
+
+    set({checkingAuth: true})
+    try {
+      const res = await axiosInstance.post("/auth/refresh-token");
+      set({ checkingAuth: false});
+      return res.data
+    } catch (error) {
+     set({user: null, checkingAuth: false});
+     throw error
+    }
+  },
 }));
+
+let refreshPromise = null;
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if(error.response?.status === 401 && !originalRequest._retry){
+      originalRequest._retry = true;
+      try {
+        if(refreshPromise){
+          await refreshPromise;
+          return axiosInstance(originalRequest);
+        }
+        refreshPromise = useUserStore.getState().refreshToken();
+        await refreshPromise
+        refreshPromise = null
+
+        return axiosInstance(originalRequest);
+      } catch (error) {
+        useUserStore.getState().logout();
+        return Promise.reject(refreshError);
+      }
+    }
+    return Promise.reject(error);
+  }
+)
