@@ -1,5 +1,5 @@
 import cloudinary from "../db/cloudinary.js";
-import Product from "../db/model/Products.js";
+import Product from "../db/model/products.model.js";
 import { redis } from "../db/redis.js";
 import { uploadToCloudinary } from "../utils/uploadToCloudinary.js";
 

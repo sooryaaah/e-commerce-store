@@ -1,5 +1,5 @@
-import User from "../db/model/User.js";
-import Product from "../db/model/Products.js";
+import User from "../db/model/user.model.js";
+import Product from "../db/model/products.model.js";
 import Order from "../db/model/Order.js";
 
 export const getAnalyticsData = async () => {
